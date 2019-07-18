@@ -88,6 +88,15 @@ int main(int argc, char *argv[])
 }
 ```
 
+# 基于https://github.com/LiuXiaolong19920720/simple_net修改, 增加CMakeLists.txt，支持opencv2.4/opencv3.2
+```
+在ubuntu16.04可以安装多个opencv版本，只需要在CMake中指定opencv的路径即可
+set(OpenCV_DIR "/usr/local/opencv2.4/share/OpenCV")
+find_package( OpenCV REQUIRED )
 
+opencv2.4 build
+cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local/opencv2.4  ..
+
+```
 
 
