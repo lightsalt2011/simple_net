@@ -1,4 +1,5 @@
-#include<opencv2\opencv.hpp>
+#include<opencv2/opencv.hpp>
+#include <opencv2/ml/ml.hpp>
 #include<iostream>
 using namespace std;
 using namespace cv;
@@ -7,13 +8,21 @@ using namespace cv;
 int csv2xml()
 //int main()
 {
-	CvMLData mlData;
-	mlData.read_csv("train.csv");//¶ÁÈ¡csvÎÄ¼ş
-	Mat data = cv::Mat(mlData.get_values(), true);
-	cout << "Data have been read successfully!" << endl;
+	// cv::ml::TrainData mlData;
+	// mlData.read_csv("train.csv");//ï¿½ï¿½È¡csvï¿½Ä¼ï¿½
+	// Mat data = cv::Mat(mlData.get_values(), true);
+	// cout << "Data have been read successfully!" << endl;
 	//Mat double_data;
 	//data.convertTo(double_data, CV_64F);
-	
+
+	Ptr<ml::TrainData> mlData;
+	mlData = ml::TrainData::loadFromCSV("train.csv",1);
+	// Mat m = mlData->getTrainSamples();
+	Mat data = cv::Mat(mlData->getTrainSamples(), true);
+	cout << "Data have been read successfully!" << endl;
+
+
+
 	Mat input_ = data(Rect(1, 1, 784, data.rows - 1)).t();
 	Mat label_ = data(Rect(0, 1, 1, data.rows - 1));
 	Mat target_(10, input_.cols, CV_32F, Scalar::all(0.));

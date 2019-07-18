@@ -28,6 +28,7 @@ namespace liu
 	{
 		layer_neuron_num = layer_neuron_num_;
 		//Generate every layer.
+		//layer is a vertor by lightsalt
 		layer.resize(layer_neuron_num.size());
 		for (int i = 0; i < layer.size(); i++)
 		{
@@ -36,8 +37,8 @@ namespace liu
 		std::cout << "Generate layers, successfully!" << std::endl;
 
 		//Generate every weights matrix and bias
-		weights.resize(layer.size() - 1);
-		bias.resize(layer.size() - 1);
+		weights.resize(layer.size() - 1);//=2, by lightsalt
+		bias.resize(layer.size() - 1);//=2, by lightsalt
 		for (int i = 0; i < (layer.size() - 1); ++i)
 		{
 			weights[i].create(layer[i + 1].rows, layer[i].rows, CV_32FC1);
@@ -72,7 +73,7 @@ namespace liu
 	}
 
 	//Initialise the bias matrices.
-	void Net::initBias(cv::Scalar& bias_)
+	void Net::initBias(cv::Scalar bias_)
 	{
 		for (int i = 0; i < bias.size(); i++)
 		{
@@ -81,14 +82,14 @@ namespace liu
 	}
 
 	//Forward
-	void Net::farward()
+	void Net::forward()
 	{
 		for (int i = 0; i < layer_neuron_num.size() - 1; ++i)
 		{
 			cv::Mat product = weights[i] * layer[i] + bias[i];
 			layer[i + 1] = activationFunction(product, activation_function);
 		}
-		calcLoss(layer[layer.size() - 1], target, output_error, loss);
+		calcLoss(layer[layer.size() - 1], target, output_error, loss);//只计算最后输出的10*1的损失，和target做均方差比较
 	}
 
 	//Compute delta error
@@ -103,7 +104,9 @@ namespace liu
 			//Output layer delta error
 			if (i == delta_err.size() - 1)
 			{
+				// std::cout<< "1 output_error.size" << output_error.size() << std::endl;
 				delta_err[i] = dx.mul(output_error);
+				// std::cout<< "1 delta_err[i].size" << delta_err[i].size() << std::endl;
 			}
 			else  //Hidden layer delta error
 			{
@@ -111,6 +114,7 @@ namespace liu
 				cv::Mat weight_t = weights[i].t();
 				cv::Mat delta_err_1 = delta_err[i];
 				delta_err[i] = dx.mul((weights[i + 1]).t() * delta_err[i + 1]);
+				// std::cout<< "2 delta_err[i].size" << delta_err[i].size() << std::endl;
 			}
 		}
 	}
@@ -145,7 +149,7 @@ namespace liu
 			return;
 		}
 
-		std::cout << "Train,begain!" << std::endl;
+		std::cout << "Train,begin!" << std::endl;
 
 		cv::Mat sample;
 		if (input.rows == (layer[0].rows) && input.cols == 1)
@@ -153,13 +157,13 @@ namespace liu
 			target = target_;
 			sample = input;
 			layer[0] = sample;
-			farward();
+			forward();
 			//backward();
 			int num_of_train = 0;
 			while (accuracy < accuracy_threshold)
 			{
 				backward();
-				farward();
+				forward();
 				num_of_train++;
 				if (num_of_train % 500 == 0)
 				{
@@ -184,7 +188,7 @@ namespace liu
 					sample = input.col(i);
 
 					layer[0] = sample;
-					farward();
+					forward();
 					batch_loss += loss;
 					backward();
 				}
@@ -219,7 +223,7 @@ namespace liu
 			return;
 		}
 
-		std::cout << "Train,begain!" << std::endl;
+		std::cout << "Train,begin!" << std::endl;
 
 		cv::Mat sample;
 		if (input.rows == (layer[0].rows) && input.cols == 1)
@@ -227,13 +231,13 @@ namespace liu
 			target = target_;
 			sample = input;
 			layer[0] = sample;
-			farward();
+			forward();
 			//backward();
 			int num_of_train = 0;
 			while (loss > loss_threshold)
 			{
 				backward();
-				farward();
+				forward();
 				num_of_train++;
 				if (num_of_train % 500 == 0)
 				{
@@ -258,7 +262,7 @@ namespace liu
 					sample = input.col(i);
 					layer[0] = sample;
 
-					farward();
+					forward();
 					backward();
 
 					batch_loss += loss;
@@ -359,7 +363,7 @@ namespace liu
 		if (input.rows == (layer[0].rows) && input.cols == 1)
 		{
 			layer[0] = input;
-			farward();
+			forward();
 
 			cv::Mat layer_out = layer[layer.size() - 1];
 			cv::Point predict_maxLoc;
@@ -377,18 +381,17 @@ namespace liu
 	//Predict,more  than one samples
 	std::vector<int> Net::predict(cv::Mat &input)
 	{
-		cv::Mat sample;
+		std::vector<int> predicted_labels;
 		if (input.rows == (layer[0].rows) && input.cols > 1)
 		{
-			std::vector<int> predicted_labels;
 			for (int i = 0; i < input.cols; ++i)
 			{
-				sample = input.col(i);
+				cv::Mat sample = input.col(i);
 				int predicted_label = predict_one(sample);
 				predicted_labels.push_back(predicted_label);
-				return predicted_labels;
 			}
 		}
+		return predicted_labels;
 	}
 
 	//Save model;

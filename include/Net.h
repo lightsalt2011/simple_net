@@ -7,9 +7,11 @@
 #pragma once
 
 #include <iostream>
-#include<opencv2\core\core.hpp>
-#include<opencv2\highgui\highgui.hpp>
+#include<opencv2/core/core.hpp>
+#include<opencv2/highgui/highgui.hpp>
 //#include<iomanip>
+// #include <opencv2/highgui/highgui.hpp>
+#include<opencv2/opencv.hpp>  
 
 #include"Function.h"
 
@@ -43,7 +45,7 @@ namespace liu
 		Net() {};
 		~Net() {};
 
-		//Initialize net:genetate weights matrices¡¢layer matrices and bias matrices
+		//Initialize net:genetate weights matricesï¿½ï¿½layer matrices and bias matrices
 		// bias default all zero
 		void initNet(std::vector<int> layer_neuron_num_);
 
@@ -51,10 +53,10 @@ namespace liu
 		void initWeights(int type = 0, double a = 0., double b = 0.1);
 
 		//Initialise the bias matrices.
-		void initBias(cv::Scalar& bias);
+		void initBias(cv::Scalar bias);
 
 		//Forward
-		void farward();
+		void forward();
 
 		//Forward
 		void backward();
@@ -63,7 +65,7 @@ namespace liu
 		void train(cv::Mat input, cv::Mat target, float accuracy_threshold);
 
 		//Train,use loss_threshold
-		void Net::train(cv::Mat input, cv::Mat target_, float loss_threshold, bool draw_loss_curve = false);
+		void train(cv::Mat input, cv::Mat target_, float loss_threshold, bool draw_loss_curve = false);
 
 		//Test
 		void test(cv::Mat &input, cv::Mat &target_);
